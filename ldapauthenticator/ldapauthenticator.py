@@ -301,11 +301,12 @@ class LDAPAuthenticator(Authenticator):
         return (user_dn, response[0]["dn"])
 
     def get_connection(self, userdn, password):
+        tls = ldap3.Tls(validate=ssl.CERT_REQUIRED, version=ssl.PROTOCOL_TLSv1_2)
         server = ldap3.Server(
-            self.server_address, port=self.server_port, use_ssl=self.use_ssl
+            self.server_address, port=self.server_port, use_ssl=True, tls=tls
         )
         auto_bind = (
-            ldap3.AUTO_BIND_NO_TLS if self.use_ssl else ldap3.AUTO_BIND_TLS_BEFORE_BIND
+            ldap3.AUTO_BIND_TLS_BEFORE_BIND
         )
         conn = ldap3.Connection(
             server, user=userdn, password=password, auto_bind=auto_bind
